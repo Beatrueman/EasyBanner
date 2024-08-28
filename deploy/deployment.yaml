@@ -1,0 +1,51 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: easybanner-deployment 
+  namespace: sre-tools  # 替换为你的命名空间
+  labels:  
+    app: easybanner
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels: 
+      app: easybanner
+  template: 
+    metadata:
+      labels:
+        app: easybanner
+    spec:
+      volumes:
+        - name: easybanner-secret-config
+          secret:
+            secretName: easybanner-secret
+      containers: 
+      - name: easybanner
+        image: beatrueman/easybanner:stable
+        env:
+          - name: APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: easybanner-secret
+                key: APP_ID
+          - name: APP_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: easybanner-secret
+                key: APP_SECRET
+          - name: URL
+            valueFrom:
+              secretKeyRef:
+                name: easybanner-secret
+                key: URL
+          - name: GIN_MODE
+            valueFrom:
+              secretKeyRef:
+                name: easybanner-secret
+                key: GIN_MODE
+        volumeMounts:
+          - name: easybanner-secret-config
+            mountPath: /app/secrets
+        ports:
+        - containerPort: 8080
+

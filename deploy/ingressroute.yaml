@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1 
+kind: IngressRoute
+metadata:
+  name: easybanner-ingressroute
+  namespace: sre-tools # 替换为你的命名空间
+spec:
+  entryPoints: 
+  - web
+  routes:
+  - match: Host(``) # 替换为你的host
+    kind: Rule
+    services:
+    - name: easybanner-service
+      port: 8080

@@ -1,0 +1,32 @@
+{
+  "config": {
+    "update_multi": true
+  },
+  "i18n_elements": {
+    "zh_cn": [
+      {
+        "tag": "markdown",
+        "content": "**未出现大于250次的ip，不执行封禁:LGTM:**",
+        "text_align": "left",
+        "text_size": "normal"
+      }
+    ]
+  },
+  "i18n_header": {
+    "zh_cn": {
+      "title": {
+        "tag": "plain_text",
+        "content": "未检测到恶意IP"
+      },
+      "subtitle": {
+        "tag": "plain_text",
+        "content": ""
+      },
+      "template": "green",
+      "ud_icon": {
+        "tag": "standard_icon",
+        "token": "yes_outlined"
+      }
+    }
+  }
+}
