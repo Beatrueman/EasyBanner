@@ -23,6 +23,8 @@ jobs:
       IMAGE_REPOSITORY: ${{ vars.IMAGE_REPOSITORY || 'beatrueman/easybanner' }}
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      TARGET_IMAGE: ${{ env.IMAGE_REGISTRY_SERVICE }}/${{ env.IMAGE_REPOSITORY }}:${{ inputs.version || github.ref_name }}
+
     steps:
     - uses: actions/checkout@v4
 
@@ -36,10 +38,9 @@ jobs:
     # 构建镜像
     - name: Build the image
       run: |
-        TARGET_IMAGE="${{ env.IMAGE_REGISTRY_SERVICE }}/${{ env.IMAGE_REPOSITORY }}:${{ inputs.version || github.ref_name }}"
-        echo "Building image $TARGET_IMAGE"
-        docker build . --file Dockerfile --tag "$TARGET_IMAGE"
+        echo "Building image ${{ env.TARGET_IMAGE }}"
+        docker build . --file Dockerfile --tag "${{ env.TARGET_IMAGE }}"
 
     # 推送镜像
     - name: Push the image
-      run: docker push $TARGET_IMAGE
+      run: docker push ${{ env.TARGET_IMAGE }}
