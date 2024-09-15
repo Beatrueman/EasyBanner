@@ -1,0 +1,46 @@
+name: Build and Push Image
+
+on:
+  push:
+    tags:
+    - 'v*'
+    branches:
+      - master
+    pull_request:
+      branches:
+       - master
+  inputs:
+    version:
+      description: 'Version to tag the image with(such as v1.0.0)'
+      required: false
+      type: string
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    environment:
+      name: registry-secret
+    env:
+      IMAGE_REGISTRY_SERVICE: ${{ vars.IMAGE_REGISTRY_SERVICE || 'docker.io' }}
+      IMAGE_REPOSITORY: ${{ vars.IMAGE_REPOSITORY || 'beatrueman/easybanner' }}
+      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      TARGET_IMAGE: ${{ env.IMAGE_REGISTRY_SERVICE }}/${{ env.IMAGE_REPOSITORY }}:${{ inputs.version || github.ref_name }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # 登录仓库
+    - name: Login to registry 
+      uses: docker/login-action@v3
+      with:
+        username: ${{ env.REGISTRY_USERNAME }}
+        password: ${{ env.REGISTRY_PASSWORD }}
+
+    # 构建镜像
+    - name: Build the image
+      run: docker build . --file Dockerfile --tag ${{ env.TARGET_IMAGE }}
+
+    # 推送镜像
+    - name: Push the image
+      run: docker push ${{ env.TARGET_IMAGE }}

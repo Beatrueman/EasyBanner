@@ -152,6 +152,8 @@ kubectl create secret generic easybanner-secret \
 --namespace=your_namespace
 ```
 
+
+
 然后`apply`../deply目录下的`deployment.yaml`，`service.yaml`。
 
 所有注意修改命名空间。
@@ -173,3 +175,29 @@ kubectl apply -f ingressroute.yaml
 - 因为会对大日志文件利用bash进行查询，所以执行`GET /execute`速度会比较慢，测试大概会消耗20s左右。
 - BAN操作比较慢，需要等待一会才能更新卡片。
 
+## 更新日志
+
+### 2024/9/15
+
+添加了用于打包和推送镜像的**Github Action**
+
+使用时在Settings >> Secrets and varibles >> Actions中添加secrets 
+
+`REGISTRY_USERNAME`和`REGISTRY_PASSWORD`
+
+![image-20240915002948963](https://gitee.com/beatrueman/images/raw/master/img/202409150029068.png)
+
+如果要推送到类似Harbor的自建仓库，请添加varibles
+
+`IMAGE_REGISTRY_SERVICE`：默认为docker.io
+
+`IMAGE_REPOSITORY`：默认为beatrueman/eaesybanner
+
+推送时请指定**tag**，格式为`v1.0.0`，用于指定镜像版本
+
+```
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+或者手动指定**tag**
