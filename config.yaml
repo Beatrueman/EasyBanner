@@ -1,6 +1,6 @@
 # 飞书应用 AppID
-AppID: cli_a42011585561100d
+AppID:
 # 飞书应用 AppSecret
-AppSecret: AYRFbDlUH8OKxRweuXM47cLLFwRpO12X
+AppSecret:
 # 目标主机地址
-URL: http://172.20.14.2:9521
+URL:

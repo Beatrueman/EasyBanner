@@ -155,8 +155,6 @@ func HandleCardCallback(c *gin.Context) {
 			} else {
 				log.Println("Unknown action!")
 			}
-		} else {
-			log.Println("Event type not handled!")
 		}
 	}()
 }
