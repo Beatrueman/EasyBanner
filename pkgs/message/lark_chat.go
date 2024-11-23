@@ -42,8 +42,8 @@ func SendInteractiveMsg(client *lark.Client, chatID string) error {
 	// 判断 ip 次数，发送不同的模板
 	switch flag {
 	case 0:
-		//templatePath = "/app/EasyBanner/templates/failure.json"
-		templatePath = "EasyBanner/templates/failure.json"
+		templatePath = "/app/EasyBanner/templates/failure.json"
+		//templatePath = "EasyBanner/templates/failure.json"
 		// 读取 JSON 模板文件
 		cardContext, err = readTemplateFile(templatePath)
 		if err != nil {
@@ -61,8 +61,8 @@ func SendInteractiveMsg(client *lark.Client, chatID string) error {
 			return nil
 		}
 	case 2:
-		//templatePath = "/app/EasyBanner/templates/common.json"
-		templatePath = "EasyBanner/templates/common.json"
+		templatePath = "/app/EasyBanner/templates/common.json"
+		//templatePath = "EasyBanner/templates/common.json"
 		// 读取 JSON 模板文件
 		cardContext, err = readTemplateFile(templatePath)
 		if err != nil {
