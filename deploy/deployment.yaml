@@ -21,7 +21,7 @@ spec:
             secretName: easybanner-secret
       containers: 
       - name: easybanner
-        image: beatrueman/easybanner:stable
+        image: beatrueman/easybanner:v1.0.7
         env:
           - name: APP_ID
             valueFrom:
