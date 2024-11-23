@@ -1,0 +1,102 @@
+// 卡片回传结构体
+// https://open.feishu.cn/document/uAjLw4CM/ukzMukzMukzM/feishu-cards/card-callback-communication
+{
+  "schema": "2.0", // 回调的版本
+  "header": { // 回调基本信息
+    "event_id": "f7984f25108f8137722bb63c*****", // 回调的唯一标识
+    "token": "066zT6pS4QCbgj5Do145GfDbbag*****", // 应用的 Verification Token
+    "create_time": "1603977298000000",  // 回调发送的时间，接近回调发生的时间
+    "event_type": "card.action.trigger", // 回调类型卡片交互场景中，固定为 "card.action.trigger"
+    "tenant_key": "2df73991750*****", // 应用归属的 tenant key，即租户唯一标识
+    "app_id": "cli_a5fb0ae6a4******" // 应用的 App ID
+  },
+  "event": { // 回调的详细信息
+    "operator": {   // 回调触发者信息
+      "tenant_key": "2df73991750*****", // 回调触发者的 tenant key，即租户唯一标识
+      "user_id": "867*****", // 回调触发者的 user ID。当应用开启“获取用户 user ID”权限后，该参数返回
+      "open_id": "ou_3c14f3a59eaf2825dbe25359f15*****", // 回调触发者的 Open ID
+      "union_id": "on_cad4860e7af114fb4ff6c5d496d*****" // 回调触发者的 Union ID
+    },
+    "token": "c-295ee57216a5dc9de90fefd0aadb4b1d7d******", // 更新卡片用的凭证，有效期为 30 分钟，最多可更新 2 次
+    "action": { // 用户操作交互组件回传的数据
+      "value": { // 交互组件绑定的开发者自定义回传数据，对应组件中的 value 属性。类型为 string 或 object，可由开发者指定。
+        "key": "value"
+      },
+      "tag": "button", // 交互组件的标签
+      "timezone": "Asia/Shanghai", // 用户当前所在地区的时区。当用户操作日期选择器、时间选择器、或日期时间选择器时返回
+      "form_value": { // 表单容器内用户提交的数据
+        "field name1": [ // 表单容器内某多选组件的 name 和 value
+          "selectDemo1",
+          "selectDemo2"
+        ],
+        "field name2": "value2", // 表单容器内某交互组件的 name 和 value
+        "DatePicker_bpqdq5puvn4": "2024-04-01 +0800", // 表单容器内日期选择器组件的 name 和 value
+        "DateTimePicker_ihz2d7a74i": "2024-04-29 07:07 +0800", // 表单容器内日期时间选择器组件的 name 和 value
+        "Input_lf4fmxwfrd9": "1234", // 表单容器内输入框组件的 name 和 value
+        "PersonSelect_2ejys7ype7m": "ou_3c14f3a59eaf2825dbe25359f15*****", // 表单容器内人员选择-单选组件的 name 和 value
+        "Select_a2d5b7l3zd": "1", // 表单容器内下拉选择-单选组件的 name 和 value
+        "TimePicker_7ecsf6xkqsq": "00:00 +0800" // 表单容器内时间选择器组件的 name 和 value
+      },
+      "name": "Button_lvkepfu3" // 用户操作交互组件的名称，由开发者自定义
+    },
+    "host": "im_message", // 卡片展示场景
+    "delivery_type": "url_preview", // 卡片分发类型，固定取值为 url_preview，表示链接预览卡片仅链接预览卡片有此字段
+    "context": { //  卡片展示场景相关信息
+      "url": "xxx", // 链接地址（适用于链接预览场景）
+      "preview_token": "xxx", // 链接预览的 token（适用于链接预览场景）
+      "open_message_id": "om_574d639e4a44e4dd646eaf628e2*****", // 卡片所在的消息 ID
+      "open_chat_id": "oc_e4d2605ca917e695f54f11aaf56*****" // 卡片所在的会话 ID
+    }
+  }
+}
+
+
+// 接收消息事件体
+// https://open.feishu.cn/document/server-docs/im-v1/message/events/receive
+{
+  "schema": "2.0",
+  "header": {
+    "event_id": "5e3702a84e847582be8db7fb73283c02",
+    "event_type": "im.message.receive_v1",
+    "create_time": "1608725989000",
+    "token": "rvaYgkND1GOiu5MM0E1rncYC6PLtF7JV",
+    "app_id": "cli_9f5343c580712544",
+    "tenant_key": "2ca1d211f64f6438"
+  },
+  "event": {
+    "sender": {
+      "sender_id": {
+        "union_id": "on_8ed6aa67826108097d9ee143816345",
+        "user_id": "e33ggbyz",
+        "open_id": "ou_84aad35d084aa403a838cf73ee18467"
+      },
+      "sender_type": "user",
+      "tenant_key": "736588c9260f175e"
+    },
+    "message": {
+      "message_id": "om_5ce6d572455d361153b7cb51da133945",
+      "root_id": "om_5ce6d572455d361153b7cb5xxfsdfsdfdsf",
+      "parent_id": "om_5ce6d572455d361153b7cb5xxfsdfsdfdsf",
+      "create_time": "1609073151345",
+      "update_time": "1687343654666",
+      "chat_id": "oc_5ce6d572455d361153b7xx51da133945",
+      "thread_id": "omt_d4be107c616",
+      "chat_type": "group",
+      "message_type": "text",
+      "content": "{\"text\":\"@_user_1 hello\"}",
+      "mentions": [
+        {
+          "key": "@_user_1",
+          "id": {
+            "union_id": "on_8ed6aa67826108097d9ee143816345",
+            "user_id": "e33ggbyz",
+            "open_id": "ou_84aad35d084aa403a838cf73ee18467"
+          },
+          "name": "Tom",
+          "tenant_key": "736588c9260f175e"
+        }
+      ],
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_2_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.53 Safari/537.36 Lark/6.7.5 LarkLocale/en_US ttnet SDK-Version/6.7.8"
+    }
+  }
+}
