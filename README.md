@@ -33,6 +33,7 @@
 
 - POST /webhook：用来处理接收消息事件。
 - POST /event：用来处理卡片回调
+- POST /event/alert：用来接收来自`Grafana Alerting Webhook`的消息体
 
 ### 运行逻辑
 
@@ -133,10 +134,10 @@ go run main.go
 
 ```
 docker run -d -p 8080:8080 \
--e APP_ID=cli_a42011585561100d \ # 填写飞书应用 AppID
--e APP_SECRET=AYRFbDlUH8OKxRweuXM47cLLFwRpO12X \ # 填写飞书应用 AppSecret
--e URL=http://172.20.14.2:9521 \  # 填写检测主机地址
--e GIN_MODE=release beatrueman/easybanner:stable
+-e APP_ID=your_AppID \ # 填写飞书应用 AppID
+-e APP_SECRET=your_AppSecret \ # 填写飞书应用 AppSecret
+-e URL=your_url \  # 填写检测主机地址
+-e GIN_MODE=release beatrueman/easybanner:v1.0.7
 ```
 
 ### Kubernetes部署
@@ -145,7 +146,7 @@ docker run -d -p 8080:8080 \
 
 ```
 kubectl create secret generic easybanner-secret \
---from-literal=App_ID=your_AddID \
+--from-literal=App_ID=your_AppID \
 --from-literal=App_Secret=your_AppSecret \
 --from-literal=URL=your_url \
 --from-literal=GIN_MODE=release \ # 设置gin为生产模式
@@ -227,7 +228,7 @@ git push origin v1.0.0
   
   ```
 
-- `InitConfig.go`：将原先的initConfig()封装为包
+- `InitConfig.go`：将原`initConfig()`封装为包
 
 #### 新增根据Grafana Alerting直接推送恶意IP列表并直接封禁的逻辑
 
