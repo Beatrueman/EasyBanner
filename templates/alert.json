@@ -1,0 +1,53 @@
+{
+  "receiver": "mirror-test",
+  "status": "firing",
+  "orgId": 1,
+  "alerts": [
+    {
+      "status": "firing",
+      "labels": {
+        "alertname": "aviation telecom带宽持续满载",
+        "device": "telecom",
+        "grafana_folder": "mirror",
+        "instance": "198.18.114.2:9100",
+        "job": "node-exporter",
+        "namespace": "mirror"
+      },
+      "annotations": {
+        "description": "aviation带宽持续满载",
+        "summary": "aviation带宽持续满载，可能有恶意流量，请手动排查。"
+      },
+      "startsAt": "2024-05-30T10:25:30Z",
+      "endsAt": "0001-01-01T00:00:00Z",
+      "generatorURL": "https://grafana.redrock.team/alerting/grafana/adn3239c7vawwc/view?orgId=1",
+      "fingerprint": "1894ec986fe5d383",
+      "silenceURL": "https://grafana.redrock.team/alerting/silence/new?alertmanager=grafana&matcher=alertname%3Daviation+telecom%E5%B8%A6%E5%AE%BD%E6%8C%81%E7%BB%AD%E6%BB%A1%E8%BD%BD&matcher=device%3Dtelecom&matcher=grafana_folder%3Dmirror&matcher=instance%3D198.18.114.2%3A9100&matcher=job%3Dnode-exporter&matcher=namespace%3Dmirror&orgId=1",
+      "dashboardURL": "https://grafana.redrock.team/d/cdn592h0ghzwgf?orgId=1",
+      "panelURL": "https://grafana.redrock.team/d/cdn592h0ghzwgf?orgId=1&viewPanel=9",
+      "values": {
+        "A": 5.091481347669635,
+        "C": 1
+      },
+      "valueString": "[ var='A' labels={device=telecom, instance=198.18.114.2:9100, job=node-exporter} value=5.091481347669635 ], [ var='C' labels={device=telecom, instance=198.18.114.2:9100, job=node-exporter} value=1 ]"
+    }
+  ],
+  "commonLabels": {
+    "alertname": "aviation telecom带宽持续满载",
+    "device": "telecom",
+    "grafana_folder": "mirror",
+    "instance": "198.18.114.2:9100",
+    "job": "node-exporter",
+    "namespace": "mirror"
+  },
+  "commonAnnotations": {
+    "description": "aviation带宽持续满载",
+    "summary": "aviation带宽持续满载，可能有恶意流量，请手动排查。"
+  },
+  "externalURL": "https://grafana.redrock.team/",
+  "groupKey": "{}/{namespace=\"mirror\"}:{alertname=\"aviation telecom带宽持续满载\", grafana_folder=\"mirror\"}",
+  "groupLabels": {
+    "alertname": "aviation telecom带宽持续满载",
+    "grafana_folder": "mirror"
+  },
+  "message": "Firing\n\nValue: A=5.091481347669635, C=1\nLabels:\n - alertname = aviation telecom带宽持续满载\n - device = telecom\n - grafana_folder = mirror\n - instance = 198.18.114.2:9100\n - job = node-exporter\n"
+}

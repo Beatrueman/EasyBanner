@@ -32,7 +32,7 @@ func readTemplateFile(filePath string) (string, error) {
 }
 
 // 发送交互消息
-func SendInteractiveMsg(client *lark.Client, chatID string, messageID string) error {
+func SendInteractiveMsg(client *lark.Client, chatID string) error {
 	flag := data.CheckCount()
 
 	var templatePath string
@@ -42,7 +42,8 @@ func SendInteractiveMsg(client *lark.Client, chatID string, messageID string) er
 	// 判断 ip 次数，发送不同的模板
 	switch flag {
 	case 0:
-		templatePath = "/app/EasyBanner/templates/failure.json"
+		//templatePath = "/app/EasyBanner/templates/failure.json"
+		templatePath = "EasyBanner/templates/failure.json"
 		// 读取 JSON 模板文件
 		cardContext, err = readTemplateFile(templatePath)
 		if err != nil {
@@ -60,7 +61,73 @@ func SendInteractiveMsg(client *lark.Client, chatID string, messageID string) er
 			return nil
 		}
 	case 2:
+		//templatePath = "/app/EasyBanner/templates/common.json"
+		templatePath = "EasyBanner/templates/common.json"
+		// 读取 JSON 模板文件
+		cardContext, err = readTemplateFile(templatePath)
+		if err != nil {
+			log.Println("Failed to read JSON file:", err)
+			return err
+		}
+	}
+
+	// 构建消息请求
+	req := larkim.NewCreateMessageReqBuilder().
+		ReceiveIdType(larkim.ReceiveIdTypeChatId).
+		Body(larkim.NewCreateMessageReqBodyBuilder().
+			MsgType(larkim.MsgTypeInteractive).
+			ReceiveId(chatID).
+			Content(cardContext).
+			Build()).
+		Build()
+
+	// 发送消息
+	resp, err := client.Im.Message.Create(context.Background(), req)
+	if err != nil {
+		log.Println("Failed to send message:", err)
+		return err
+	}
+
+	if !resp.Success() {
+		log.Println("Failed to send message!", resp)
+		return err
+	}
+
+	return nil
+}
+
+// 发送无按键的交互消息
+func SendInteractiveNoButtonMsg(client *lark.Client, chatID string) error {
+	flag := data.CheckCount()
+
+	var templatePath string
+	var cardContext string
+	var err error
+
+	// 判断 ip 次数，发送不同的模板
+	switch flag {
+	case 0:
+		templatePath = "/app/EasyBanner/templates/failure.json"
+		//templatePath = "EasyBanner/templates/failure.json"
+		// 读取 JSON 模板文件
+		cardContext, err = readTemplateFile(templatePath)
+		if err != nil {
+			log.Println("Failed to read JSON file:", err)
+			return err
+		}
+	case 1:
+		// 生成包含 IP 数据的 JSON 模板
+		cardContext, err = data.GetNeedBanIPNoButton()
+		if err != nil {
+			return err
+		}
+		if cardContext == "" { // 如果没有需要 ban 的 IP，返回错误
+			log.Println("No IPs to ban")
+			return nil
+		}
+	case 2:
 		templatePath = "/app/EasyBanner/templates/common.json"
+		//templatePath = "EasyBanner/templates/common.json"
 		// 读取 JSON 模板文件
 		cardContext, err = readTemplateFile(templatePath)
 		if err != nil {
@@ -171,6 +238,36 @@ func UpdateInteractiveMsg(client *lark.Client, messageID string, ipDataList []mo
 	}
 
 	log.Println("卡片更新成功！")
+	return nil
+}
+
+// 更新消息卡片内容
+func UpdateNoButtonInteractiveMsg(client *lark.Client, messageID string, ipDataList []model.IPData, resultText string) error {
+	// 生成新的卡片内容
+	cardContent, err := data.GenerateNoButtonTemplate(ipDataList, false, resultText)
+	if err != nil {
+		return err
+	}
+
+	// 创建请求对象
+	req := larkim.NewPatchMessageReqBuilder().
+		MessageId(messageID).
+		Body(larkim.NewPatchMessageReqBodyBuilder().
+			Content(cardContent).
+			Build()).
+		Build()
+
+	// 发起请求
+	resp, err := client.Im.Message.Patch(context.Background(), req)
+	if err != nil {
+		return err
+	}
+
+	if !resp.Success() {
+		return fmt.Errorf("failed to update message: %v", resp)
+	}
+
+	log.Println("无按钮卡片更新成功！")
 	return nil
 }
 

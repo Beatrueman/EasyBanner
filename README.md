@@ -201,3 +201,56 @@ git push origin v1.0.0
 ```
 
 或者手动指定**tag**
+
+### 2024/11/23
+
+为了解决机器人在无人值守的情况下也能够自动封禁IP，现在增加了自动封禁IP功能。
+
+结合了`Grafana Alerting`，机器人能够做到Grafana在alert后，自动在飞书群中发送恶意IP列表，并且自动执行封禁IP。
+
+#### 新增了模拟Grafana Alerting发送报警的过程
+
+在`EasyBanner/utils/mock`中新增`mock.go`，用于发送`templates/alert.json`，其中`alert.json`中包含了`Grafana Alerting Webhook`的消息体，详细内容可在仓库或[配置用于警报的 Webhook 通知程序 | Grafana 文档 - Grafana 可观测平台](https://grafana.org.cn/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/webhook-notifier/)查看。方便了开发过程中的对EasyBanner的测试。
+
+#### 新增了一些获取基本信息的函数
+
+在`EasyBanner/utils/base`下新增`info.go`和`InitConfig.go`
+
+- `info.go`
+
+  ```
+  func GetTenantAccessToken() string {}                      // 获取机器人的tenant_access_token
+  
+  func GetChatID() string {}                                 // 获取机器人所在群聊 chat_id
+  
+  func GetLatestMessageID(AppID string) (string, error) {}   // 获取群组来自EB的最新一个卡片的message_id
+  
+  ```
+
+- `InitConfig.go`：将原先的initConfig()封装为包
+
+#### 新增根据Grafana Alerting直接推送恶意IP列表并直接封禁的逻辑
+
+`EasyBanner/pkgs/grafana/receive.go`：用于接收来自Grafana联络点的消息体，提取`Alerts.labels.alertname`。其中alertname有预设的两种：
+
+- aviation telecom带宽持续满载
+- 集群内部流量
+
+当`alertname`不为空时，会发送无按键的交互卡片消息，等待一段时间后，机器人会调用远程机器的封禁/ban接口，然后对IP封禁，最后更新卡片，响应封禁是否成功。
+
+新增的函数
+
+```
+// 用于不需要按键交互的生成模板
+func GenerateNoButtonTemplate(ipDataList []model.IPData, showButton bool, resultText string) (string, error) {}
+
+// 获取所有次数大于250次的IP以及对应的次数填充至 JSON 模板，无按键版
+func GetNeedBanIPNoButton() (string, error) {}
+
+// 获取alertname，输出报警类型
+func GetAlertName(body *model.Body) (string, error) {}
+
+// 无按键版卡片交互
+func HandleAlert(c *gin.Context) {}
+```
+

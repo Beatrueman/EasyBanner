@@ -91,6 +91,41 @@ func GetNeedBanIP() (string, error) {
 	return finalJSON, nil
 }
 
+// 获取所有次数大于250次的IP以及对应的次数填充至 JSON 模板，无按键版
+func GetNeedBanIPNoButton() (string, error) {
+	result := GetIP()
+
+	// 列表保存需要禁止的IP
+	var needBanIPs []model.IPData
+
+	for _, ipData := range result {
+		if ipData.Count >= 250 {
+			needBanIPs = append(needBanIPs, ipData)
+		}
+	}
+
+	// 检查是否有需要禁止的IP
+	if len(needBanIPs) == 0 {
+		log.Println("没有大于250次的IP！")
+		return "", nil
+	}
+
+	// 输出需要 ban 的 IP 和 次数
+	log.Println("需要禁止的IP以及对应次数：")
+	for _, ipData := range needBanIPs {
+		log.Printf("IP: %s, count: %d", ipData.IP, ipData.Count)
+	}
+
+	// 生成包含 IP 数据的 JSON 模板
+	finalJSON, err := GenerateNoButtonTemplate(needBanIPs, true, "")
+	if err != nil {
+		log.Println("生成模板失败:", err)
+		return "", nil
+	}
+
+	return finalJSON, nil
+}
+
 // 获取所有次数大于250次的IP以及对应的次数
 func GetNeedBanIPList() (string, error) {
 	result := GetIP()

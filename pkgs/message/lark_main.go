@@ -3,6 +3,9 @@ package message
 import (
 	"EasyBanner/model"
 	"EasyBanner/pkgs/data"
+	"EasyBanner/pkgs/grafana"
+	"EasyBanner/utils"
+	"EasyBanner/utils/base"
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
@@ -65,7 +68,7 @@ func HandleWebhook(c *gin.Context) {
 
 				client := lark.NewClient(viper.GetString("AppID"), viper.GetString("AppSecret"))
 
-				err = SendInteractiveMsg(client, messageBody.Event.Message.ChatID, messageBody.Event.Message.MessageID)
+				err = SendInteractiveMsg(client, messageBody.Event.Message.ChatID)
 				if err != nil {
 					return
 				}
@@ -85,7 +88,6 @@ func HandleWebhook(c *gin.Context) {
 
 // 处理卡片回调
 func HandleCardCallback(c *gin.Context) {
-
 	// 先读取请求体内容
 	body, err := io.ReadAll(c.Request.Body)
 	if err != nil {
@@ -155,6 +157,111 @@ func HandleCardCallback(c *gin.Context) {
 			} else {
 				log.Println("Unknown action!")
 			}
+		}
+	}()
+}
+
+func HandleAlert(c *gin.Context) {
+	// 先读取请求体内容
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Println("error reading message body:", err)
+		return
+	}
+
+	// 检查 Challenge
+	challenge, err := HandleLarkCallBack(body)
+	if err == nil && challenge != "" {
+		c.JSON(http.StatusOK, gin.H{"challenge": challenge})
+		return
+	}
+
+	// 再次设置请求体，以便 GetMessageBody 读取
+	c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	// 立即返回 HTTP 200 响应
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+
+	go func() {
+		// 调用 GetAlertName
+		var body model.Body
+		if err := c.ShouldBindJSON(&body); err != nil {
+			log.Println("Invalid request body")
+			utils.RespFail(c, "Invalid request body")
+			return
+		}
+
+		alertname, err := grafana.GetAlertName(&body)
+		if err != nil {
+			log.Println(err)
+			utils.RespSuccess(c, err.Error())
+			return
+		}
+
+		if alertname != "" {
+			log.Println("Alerting --> ", alertname)
+
+			client := lark.NewClient(viper.GetString("AppID"), viper.GetString("AppSecret"))
+
+			// 获取机器人所在群聊的 chat_id
+			ChatID := base.GetChatID()
+
+			// 发送卡片
+			err = SendInteractiveNoButtonMsg(client, ChatID)
+			if err != nil {
+				return
+			}
+
+			// 更新卡片
+			base.InitConfig()
+			AppID := viper.GetString("AppID")
+			messageID, err := base.GetLatestMessageID(AppID)
+			if err != nil {
+				log.Println("Error getting latest message ID:", err)
+				return
+			}
+
+			// 获取需要封禁的 IP 列表
+			ipDataJSON, err := data.GetNeedBanIPList()
+			log.Println("IP data JSON:", string(ipDataJSON))
+			if err != nil {
+				log.Println("IP list is null!")
+				return
+			}
+
+			// 如果 ipDataJSON 为空，则不执行卡片更新
+			if ipDataJSON == "[]" {
+				log.Println("No IP data to ban, skipping card update.")
+				return
+			}
+
+			// 执行封禁操作
+			success, err := data.ExecuteBanIP(ipDataJSON)
+			if err != nil {
+				log.Println("Failed to execute ban IP operation:", err)
+			}
+
+			// 更新卡片内容
+			client = lark.NewClient(viper.GetString("AppID"), viper.GetString("AppSecret"))
+			ipDataList := data.ParseIPDataJSON(ipDataJSON) // 解析 IP 数据
+
+			// 根据封禁操作的结果生成文本
+			resultText := ""
+			if success {
+				resultText = "✅ 封禁 IP 操作成功!"
+			} else {
+				resultText = "🔴 封禁 IP 操作失败，请稍后重试。"
+			}
+
+			// 更新交互式卡片
+			if err := UpdateNoButtonInteractiveMsg(client, messageID, ipDataList, resultText); err != nil {
+				log.Println("Error updating card:", err)
+			} else {
+				log.Println("Card updated successfully!")
+			}
+		} else {
+			log.Println("Not receive alert!")
+			return
 		}
 	}()
 }
